@@ -27,6 +27,18 @@ INCLUDELIB gdi32.lib
 ; user32: windows, messages, and keyboard input.
 ; gdi32: lines, pens, brushes, and back buffers.
 
+; Forward declarations for later Win32 code.
+WinMain PROTO,
+    hInst:DWORD,
+    hPrevInst:DWORD,
+    lpCmdLine:DWORD,
+    nCmdShow:DWORD
+WndProc PROTO,
+    hWnd:DWORD,
+    uMsg:DWORD,
+    wParam:DWORD,
+    lParam:DWORD
+
 .code
 main PROC
     exit
