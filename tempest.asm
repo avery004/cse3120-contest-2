@@ -13,7 +13,7 @@ FRAME_MS      EQU 16
 ; TIMER_ID identifies the game update timer.
 ; FRAME_MS targets about 60 updates per second.
 ; Keep sizes fixed while early drawing code is simple.
-; Later passes can replace these with client-area calculations.
+; Future code can replace these with client-area calculations.
 
 INCLUDE Irvine32.inc
 ; Irvine32.inc supplies course helpers and usually includes SmallWin.inc.
@@ -44,7 +44,7 @@ className   BYTE "MASMTempestWindow",0
 windowTitle BYTE "MASM Tempest",0
 hInstance   DWORD 0
 hWndMain    DWORD 0
-; Pass 5 stores future window identifiers.
+; Stores future window identifiers.
 ; className is used when registering the class.
 ; windowTitle appears in the title bar.
 ; hInstance is filled before WinMain runs.
@@ -54,5 +54,16 @@ hWndMain    DWORD 0
 main PROC
     exit
 main ENDP
+
+; Placeholder WinMain keeps the future window path linkable.
+; Startup still enters main until the window setup is ready.
+WinMain PROC,
+    hInst:DWORD,
+    hPrevInst:DWORD,
+    lpCmdLine:DWORD,
+    nCmdShow:DWORD
+    xor eax, eax
+    ret
+WinMain ENDP
 
 END main
