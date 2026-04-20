@@ -52,11 +52,17 @@ hWndMain    DWORD 0
 
 .code
 main PROC
-    exit
+    INVOKE GetModuleHandle, 0
+    mov hInstance, eax
+    INVOKE WinMain, hInstance, 0, 0, 1
+    INVOKE ExitProcess, eax
 main ENDP
 
 ; Placeholder WinMain keeps the future window path linkable.
-; Startup still enters main until the window setup is ready.
+; Program startup enters main first.
+; main initializes hInstance before calling WinMain.
+; The fourth WinMain argument is the initial show command.
+; The placeholder returns 0 until window setup is added.
 WinMain PROC,
     hInst:DWORD,
     hPrevInst:DWORD,
