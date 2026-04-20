@@ -39,6 +39,17 @@ WndProc PROTO,
     wParam:DWORD,
     lParam:DWORD
 
+.data
+className   BYTE "MASMTempestWindow",0
+windowTitle BYTE "MASM Tempest",0
+hInstance   DWORD 0
+hWndMain    DWORD 0
+; Pass 5 stores future window identifiers.
+; className is used when registering the class.
+; windowTitle appears in the title bar.
+; hInstance is filled before WinMain runs.
+; hWndMain stores the CreateWindowEx result.
+
 .code
 main PROC
     exit
