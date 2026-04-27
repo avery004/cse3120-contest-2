@@ -345,8 +345,22 @@ DrawPlayer PROC,
     ret
 DrawPlayer ENDP
 
-; UpdateGame is empty until moving objects are added.
+; UpdateGame advances active shots with a simple fixed step.
 UpdateGame PROC
+    mov ecx, 0
+update_shots:
+    cmp ecx, MAX_SHOTS
+    jae update_done
+    cmp BYTE PTR shotActive[ecx], 0
+    je next_shot
+    add DWORD PTR shotDepth[ecx*4], 12
+    cmp DWORD PTR shotDepth[ecx*4], NEAR_RADIUS
+    jbe next_shot
+    mov BYTE PTR shotActive[ecx], 0
+next_shot:
+    inc ecx
+    jmp update_shots
+update_done:
     ret
 UpdateGame ENDP
 
