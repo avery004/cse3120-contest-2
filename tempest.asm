@@ -80,6 +80,16 @@ nearYPoints DWORD 80, 110, 190, 300, 410, 490
 ; These values avoid runtime trig in the first geometry build.
 ; The far ring will use the same lane order later.
 ; Tunnel drawing can loop over these arrays directly.
+; Matching far-ring coordinates for the same lane order.
+farXPoints  DWORD 400, 445, 478, 490, 478, 445
+           DWORD 400, 355, 322, 310, 322, 355
+farYPoints  DWORD 210, 222, 255, 300, 345, 378
+           DWORD 390, 378, 345, 300, 255, 222
+; Near and far indices connect into the same tunnel lane.
+; These points keep the far ring centered on the same origin.
+; The smaller ring leaves room for inward lane lines.
+; Drawing code can reuse the same loop bounds for both rings.
+; Later loops can step through both arrays with one lane index.
 
 .code
 main PROC
