@@ -350,8 +350,22 @@ UpdateGame PROC
     ret
 UpdateGame ENDP
 
-; FireShot is empty until shot-slot activation is added.
+; FireShot activates the first free shot slot.
 FireShot PROC
+    mov ecx, 0
+find_free_shot:
+    cmp ecx, MAX_SHOTS
+    jae fire_done
+    cmp BYTE PTR shotActive[ecx], 0
+    je activate_shot
+    inc ecx
+    jmp find_free_shot
+activate_shot:
+    mov BYTE PTR shotActive[ecx], 1
+    mov eax, playerLane
+    mov DWORD PTR shotLane[ecx*4], eax
+    mov DWORD PTR shotDepth[ecx*4], 0
+fire_done:
     ret
 FireShot ENDP
 
