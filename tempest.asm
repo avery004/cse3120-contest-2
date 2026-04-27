@@ -48,6 +48,9 @@ WndProc PROTO,
     uMsg:DWORD,
     wParam:DWORD,
     lParam:DWORD
+; DrawTunnel will own the wireframe tunnel drawing path.
+DrawTunnel PROTO,
+    hdc:DWORD
 
 .data
 className   BYTE "MASMTempestWindow",0
@@ -164,6 +167,8 @@ WndProc PROC,
     mov blackBrush, eax
     ; FillRect uses the stock brush, so there is nothing to delete here.
     INVOKE FillRect, paintData.hdc, ADDR paintData.rcPaint, blackBrush
+    ; DrawTunnel will replace the temporary test line over time.
+    INVOKE DrawTunnel, paintData.hdc
     INVOKE CreatePen, PS_SOLID, 1, 0000FFFFh
     mov testPen, eax
     INVOKE SelectObject, paintData.hdc, testPen
@@ -205,5 +210,11 @@ not_destroy:
     ; DefWindowProc returns the result in eax.
     ret
 WndProc ENDP
+
+; DrawTunnel is empty until the first ring loops are added.
+DrawTunnel PROC,
+    hdc:DWORD
+    ret
+DrawTunnel ENDP
 
 END main
