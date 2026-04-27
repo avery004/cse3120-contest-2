@@ -60,12 +60,12 @@ main PROC
     INVOKE ExitProcess, eax
 main ENDP
 
-; WinMain prepares the window class and registration call.
+; WinMain prepares the window class and shows the first window.
 ; Program startup enters main first.
 ; main initializes hInstance before calling WinMain.
-; The fourth WinMain argument is the initial show command.
-; WinMain now begins preparing the WNDCLASS record.
-; Registration and window creation are added later.
+; The fourth WinMain argument becomes ShowWindow's command.
+; The class is registered before the window is created.
+; The message loop is added after the window shell is stable.
 WinMain PROC,
     hInst:DWORD,
     hPrevInst:DWORD,
@@ -84,7 +84,7 @@ WinMain PROC,
     mov eax, 1
     ret
 class_ready:
-    ; The window is created here but not shown yet.
+    ; Create the main window before showing it.
     INVOKE CreateWindowEx, 0, ADDR className, ADDR windowTitle,
         WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
         WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0, hInst, 0
@@ -94,6 +94,10 @@ class_ready:
     mov eax, 1
     ret
 window_ready:
+    ; ShowWindow applies the requested initial display state.
+    INVOKE ShowWindow, hWndMain, nCmdShow
+    ; UpdateWindow forces the first paint immediately.
+    INVOKE UpdateWindow, hWndMain
     xor eax, eax
     ret
 WinMain ENDP
