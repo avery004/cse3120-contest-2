@@ -84,6 +84,16 @@ WinMain PROC,
     mov eax, 1
     ret
 class_ready:
+    ; The window is created here but not shown yet.
+    INVOKE CreateWindowEx, 0, ADDR className, ADDR windowTitle,
+        WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
+        WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0, hInst, 0
+    mov hWndMain, eax
+    test eax, eax
+    jnz window_ready
+    mov eax, 1
+    ret
+window_ready:
     xor eax, eax
     ret
 WinMain ENDP
