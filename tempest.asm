@@ -69,6 +69,8 @@ DrawPlayer PROTO,
 UpdateGame PROTO
 ; FireShot will activate one shot slot from the player lane.
 FireShot PROTO
+; SpawnEnemy will activate one enemy slot in a fixed lane.
+SpawnEnemy PROTO
 
 .data
 className   BYTE "MASMTempestWindow",0
@@ -412,5 +414,22 @@ activate_shot:
 fire_done:
     ret
 FireShot ENDP
+
+SpawnEnemy PROC
+    mov ecx, 0
+find_free_enemy:
+    cmp ecx, MAX_ENEMIES
+    jae spawn_done
+    cmp BYTE PTR enemyActive[ecx], 0
+    je activate_enemy
+    inc ecx
+    jmp find_free_enemy
+activate_enemy:
+    mov BYTE PTR enemyActive[ecx], 1
+    mov DWORD PTR enemyLane[ecx*4], 3
+    mov DWORD PTR enemyDepth[ecx*4], 0
+spawn_done:
+    ret
+SpawnEnemy ENDP
 
 END main
