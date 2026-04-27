@@ -211,7 +211,7 @@ not_destroy:
     ret
 WndProc ENDP
 
-; DrawTunnel starts by tracing the outer ring of the tunnel.
+; DrawTunnel traces the outer and inner rings of the tunnel.
 DrawTunnel PROC,
     hdc:DWORD
     ; Start at the top of the near ring.
@@ -224,6 +224,15 @@ draw_near_ring:
     jb draw_near_ring
     ; Close the polygon by returning to the first lane.
     INVOKE LineTo, hdc, DWORD PTR nearXPoints[0], DWORD PTR nearYPoints[0]
+    ; Trace the smaller inner ring with the same lane order.
+    INVOKE MoveToEx, hdc, DWORD PTR farXPoints[0], DWORD PTR farYPoints[0], 0
+    mov ecx, 1
+draw_far_ring:
+    INVOKE LineTo, hdc, DWORD PTR farXPoints[ecx*4], DWORD PTR farYPoints[ecx*4]
+    inc ecx
+    cmp ecx, LANE_COUNT
+    jb draw_far_ring
+    INVOKE LineTo, hdc, DWORD PTR farXPoints[0], DWORD PTR farYPoints[0]
     ret
 DrawTunnel ENDP
 
