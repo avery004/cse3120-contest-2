@@ -243,11 +243,13 @@ check_escape:
     ret
 check_destroy:
     ; WM_DESTROY is handled locally.
-    ; Other messages should use the default window procedure.
-    ; This keeps standard window behavior intact.
-    ; WM_DESTROY ends the message loop through WM_QUIT.
+    ; Stop the fixed update timer before ending the message loop.
+    ; This path runs for the close button and Escape-triggered shutdown.
     cmp uMsg, WM_DESTROY
     jne not_destroy
+    ; KillTimer is harmless if the timer is already inactive.
+    INVOKE KillTimer, hWnd, TIMER_ID
+    ; WM_QUIT makes GetMessage return 0 in WinMain.
     INVOKE PostQuitMessage, 0
     ; Return 0 after handling the destroy notification.
     xor eax, eax
@@ -255,8 +257,10 @@ check_destroy:
 not_destroy:
     ; Forward unhandled work to DefWindowProc.
     INVOKE DefWindowProc, hWnd, uMsg, wParam, lParam
+    ; Default processing covers close, move, size, and focus changes.
     ; This preserves default close, move, and sizing behavior.
     ; DefWindowProc returns the result in eax.
+    ; Only WM_DESTROY should bypass the default path above.
     ret
 WndProc ENDP
 
