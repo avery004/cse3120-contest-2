@@ -193,9 +193,22 @@ WndProc PROC,
     xor eax, eax
     ret
 check_keydown:
-    ; Escape closes the main window through WM_DESTROY.
+    ; Left arrow wraps from lane 0 to the last lane.
     cmp uMsg, WM_KEYDOWN
     jne check_destroy
+    cmp wParam, VK_LEFT
+    jne check_escape
+    cmp playerLane, 0
+    jne move_left
+    mov playerLane, LANE_COUNT
+move_left:
+    dec playerLane
+    ; Request a repaint after the lane changes.
+    INVOKE InvalidateRect, hWnd, 0, 1
+    xor eax, eax
+    ret
+check_escape:
+    ; Escape closes the main window through WM_DESTROY.
     cmp wParam, VK_ESCAPE
     jne check_destroy
     INVOKE DestroyWindow, hWnd
