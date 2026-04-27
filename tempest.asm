@@ -211,9 +211,19 @@ not_destroy:
     ret
 WndProc ENDP
 
-; DrawTunnel is empty until the first ring loops are added.
+; DrawTunnel starts by tracing the outer ring of the tunnel.
 DrawTunnel PROC,
     hdc:DWORD
+    ; Start at the top of the near ring.
+    INVOKE MoveToEx, hdc, DWORD PTR nearXPoints[0], DWORD PTR nearYPoints[0], 0
+    mov ecx, 1
+draw_near_ring:
+    INVOKE LineTo, hdc, DWORD PTR nearXPoints[ecx*4], DWORD PTR nearYPoints[ecx*4]
+    inc ecx
+    cmp ecx, LANE_COUNT
+    jb draw_near_ring
+    ; Close the polygon by returning to the first lane.
+    INVOKE LineTo, hdc, DWORD PTR nearXPoints[0], DWORD PTR nearYPoints[0]
     ret
 DrawTunnel ENDP
 
