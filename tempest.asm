@@ -65,6 +65,8 @@ DrawPlayer PROTO,
     hdc:DWORD
 ; UpdateGame will advance timed game state.
 UpdateGame PROTO
+; FireShot will activate one shot slot from the player lane.
+FireShot PROTO
 
 .data
 className   BYTE "MASMTempestWindow",0
@@ -244,13 +246,20 @@ move_left:
 check_right:
     ; Right arrow wraps from the last lane back to lane 0.
     cmp wParam, VK_RIGHT
-    jne check_escape
+    jne check_fire
     inc playerLane
     cmp playerLane, LANE_COUNT
     jb move_right_done
     mov playerLane, 0
 move_right_done:
     INVOKE InvalidateRect, hWnd, 0, 1
+    xor eax, eax
+    ret
+check_fire:
+    ; Space will fire from the current player lane.
+    cmp wParam, VK_SPACE
+    jne check_escape
+    INVOKE FireShot
     xor eax, eax
     ret
 check_escape:
@@ -340,5 +349,10 @@ DrawPlayer ENDP
 UpdateGame PROC
     ret
 UpdateGame ENDP
+
+; FireShot is empty until shot-slot activation is added.
+FireShot PROC
+    ret
+FireShot ENDP
 
 END main
