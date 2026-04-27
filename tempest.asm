@@ -492,8 +492,24 @@ SpawnEnemy ENDP
 
 ; CheckShotEnemyCollision will own shot versus enemy tests.
 CheckShotEnemyCollision PROC
-    ; The first collision step only reserves the call site and label.
-    ; Later code will compare lane and depth for active objects.
+    mov ecx, MAX_SHOTS
+check_collision_slot:
+    dec ecx
+    cmp BYTE PTR shotActive[ecx], 0
+    je next_collision_slot
+    cmp BYTE PTR enemyActive[ecx], 0
+    je next_collision_slot
+    mov eax, DWORD PTR shotLane[ecx*4]
+    cmp eax, DWORD PTR enemyLane[ecx*4]
+    jne next_collision_slot
+    mov eax, DWORD PTR shotDepth[ecx*4]
+    add eax, DWORD PTR enemyDepth[ecx*4]
+    cmp eax, NEAR_RADIUS - FAR_RADIUS
+    jae collision_done
+next_collision_slot:
+    test ecx, ecx
+    jnz check_collision_slot
+collision_done:
     ret
 CheckShotEnemyCollision ENDP
 
