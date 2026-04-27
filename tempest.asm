@@ -47,6 +47,7 @@ hWndMain    DWORD 0
 wndClass    WNDCLASS <>
 msgData     MSG <>
 paintData   PAINTSTRUCT <>
+blackBrush  DWORD 0
 ; Stores future window identifiers.
 ; className is used when registering the class.
 ; windowTitle appears in the title bar.
@@ -55,6 +56,7 @@ paintData   PAINTSTRUCT <>
 ; wndClass stores the registration data for the main window.
 ; msgData stores one message-loop record.
 ; paintData stores BeginPaint and EndPaint state.
+; blackBrush stores the stock black brush handle.
 
 .code
 main PROC
@@ -120,10 +122,16 @@ WndProc PROC,
     uMsg:DWORD,
     wParam:DWORD,
     lParam:DWORD
-    ; WM_PAINT is acknowledged before any drawing is added.
+    ; WM_PAINT clears the invalid area before custom drawing is added.
     cmp uMsg, WM_PAINT
     jne check_keydown
+    ; BeginPaint returns the device context for the invalid rectangle.
     INVOKE BeginPaint, hWnd, ADDR paintData
+    INVOKE GetStockObject, BLACK_BRUSH
+    mov blackBrush, eax
+    ; FillRect uses the stock brush, so there is nothing to delete here.
+    INVOKE FillRect, paintData.hdc, ADDR paintData.rcPaint, blackBrush
+    ; EndPaint releases the temporary paint state.
     INVOKE EndPaint, hWnd, ADDR paintData
     ; Return 0 after handling the paint request.
     xor eax, eax
