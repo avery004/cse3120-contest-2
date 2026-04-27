@@ -29,6 +29,7 @@ MAX_ENEMIES        EQU 6
 SPAWN_TICKS        EQU 45
 START_SCORE        EQU 0
 INITIAL_LIVES      EQU 3
+ENEMY_SCORE        EQU 100
 ; Twelve lanes gives the first tunnel a clear rhythm.
 ; The near radius stays close to the player edge.
 ; The far radius keeps the tunnel visually narrow.
@@ -41,6 +42,7 @@ INITIAL_LIVES      EQU 3
 ; Spawn timing starts slow enough to keep the first wave readable.
 ; The opening score and life count start from simple fixed values.
 ; This keeps the first collision rules easy to test.
+; Score stays integer-only for simple HUD output later.
 
 INCLUDE Irvine32.inc
 ; Irvine32.inc supplies course helpers and usually includes SmallWin.inc.
@@ -128,6 +130,7 @@ lives       DWORD INITIAL_LIVES
 ; lives starts at the opening reserve count.
 ; Later collision code will update both values.
 ; The HUD drawing step can read these values directly.
+; Enemy hits add a fixed score bonus.
 ; Precomputed near-ring coordinates for the first tunnel.
 ; Points start at the top and continue clockwise.
 nearXPoints DWORD 400, 510, 590, 620, 590, 510
@@ -505,7 +508,12 @@ check_collision_slot:
     mov eax, DWORD PTR shotDepth[ecx*4]
     add eax, DWORD PTR enemyDepth[ecx*4]
     cmp eax, NEAR_RADIUS - FAR_RADIUS
-    jae collision_done
+    jb next_collision_slot
+    ; Clear the matching slots and award the hit score.
+    ; The current test still compares same-index shot and enemy entries.
+    mov BYTE PTR shotActive[ecx], 0
+    mov BYTE PTR enemyActive[ecx], 0
+    add score, ENEMY_SCORE
 next_collision_slot:
     test ecx, ecx
     jnz check_collision_slot
