@@ -20,10 +20,16 @@ CENTER_Y    EQU WINDOW_HEIGHT / 2
 LANE_COUNT  EQU 12
 NEAR_RADIUS EQU 220
 FAR_RADIUS  EQU 90
+PLAYER_COLOR       EQU 0000FF00h
+PLAYER_MARKER_SIZE EQU 14
+PLAYER_PEN_WIDTH   EQU 2
+PLAYER_START_LANE  EQU 0
 ; Twelve lanes gives the first tunnel a clear rhythm.
 ; The near radius stays close to the player edge.
 ; The far radius keeps the tunnel visually narrow.
 ; Center values keep early geometry aligned in the window.
+; Player values start with a bright green marker.
+; The marker stays small enough to fit one lane edge.
 
 INCLUDE Irvine32.inc
 ; Irvine32.inc supplies course helpers and usually includes SmallWin.inc.
@@ -63,6 +69,7 @@ paintData   PAINTSTRUCT <>
 blackBrush  DWORD 0
 testPen     DWORD 0
 oldPen      DWORD 0
+playerLane  DWORD PLAYER_START_LANE
 ; Stores future window identifiers.
 ; className is used when registering the class.
 ; windowTitle appears in the title bar.
@@ -73,6 +80,9 @@ oldPen      DWORD 0
 ; paintData stores BeginPaint and EndPaint state.
 ; blackBrush stores the stock black brush handle.
 ; testPen and oldPen store temporary GDI pen handles.
+; playerLane tracks which near-ring lane the player occupies.
+; The first lane starts at the top of the tunnel.
+; Later input code wraps this value across all lanes.
 ; Precomputed near-ring coordinates for the first tunnel.
 ; Points start at the top and continue clockwise.
 nearXPoints DWORD 400, 510, 590, 620, 590, 510
