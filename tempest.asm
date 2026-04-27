@@ -25,6 +25,7 @@ PLAYER_MARKER_SIZE EQU 14
 PLAYER_PEN_WIDTH   EQU 2
 PLAYER_START_LANE  EQU 0
 MAX_SHOTS          EQU 6
+MAX_ENEMIES        EQU 6
 ; Twelve lanes gives the first tunnel a clear rhythm.
 ; The near radius stays close to the player edge.
 ; The far radius keeps the tunnel visually narrow.
@@ -33,6 +34,7 @@ MAX_SHOTS          EQU 6
 ; The marker stays small enough to fit one lane edge.
 ; Shots start with a small fixed pool.
 ; A fixed pool keeps the first firing code simple.
+; Enemy slots start with the same fixed pool size.
 
 INCLUDE Irvine32.inc
 ; Irvine32.inc supplies course helpers and usually includes SmallWin.inc.
@@ -83,6 +85,9 @@ playerLane  DWORD PLAYER_START_LANE
 shotActive  BYTE  MAX_SHOTS DUP(0)
 shotLane    DWORD MAX_SHOTS DUP(0)
 shotDepth   DWORD MAX_SHOTS DUP(0)
+enemyActive BYTE  MAX_ENEMIES DUP(0)
+enemyLane   DWORD MAX_ENEMIES DUP(0)
+enemyDepth  DWORD MAX_ENEMIES DUP(0)
 ; Stores future window identifiers.
 ; className is used when registering the class.
 ; windowTitle appears in the title bar.
@@ -100,6 +105,11 @@ shotDepth   DWORD MAX_SHOTS DUP(0)
 ; shotLane stores the lane index for each active shot.
 ; shotDepth stores tunnel depth for each active shot.
 ; The first shot logic will scan these arrays linearly.
+; enemyActive tracks which enemy slots are in use.
+; enemyLane stores the lane index for each active enemy.
+; enemyDepth stores tunnel depth for each active enemy.
+; The first enemy logic will scan these arrays linearly.
+; Enemy arrays mirror the shot layout for simple update loops.
 ; Precomputed near-ring coordinates for the first tunnel.
 ; Points start at the top and continue clockwise.
 nearXPoints DWORD 400, 510, 590, 620, 590, 510
