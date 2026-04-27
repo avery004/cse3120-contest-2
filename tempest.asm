@@ -48,6 +48,8 @@ wndClass    WNDCLASS <>
 msgData     MSG <>
 paintData   PAINTSTRUCT <>
 blackBrush  DWORD 0
+testPen     DWORD 0
+oldPen      DWORD 0
 ; Stores future window identifiers.
 ; className is used when registering the class.
 ; windowTitle appears in the title bar.
@@ -57,6 +59,7 @@ blackBrush  DWORD 0
 ; msgData stores one message-loop record.
 ; paintData stores BeginPaint and EndPaint state.
 ; blackBrush stores the stock black brush handle.
+; testPen and oldPen store temporary GDI pen handles.
 
 .code
 main PROC
@@ -131,6 +134,14 @@ WndProc PROC,
     mov blackBrush, eax
     ; FillRect uses the stock brush, so there is nothing to delete here.
     INVOKE FillRect, paintData.hdc, ADDR paintData.rcPaint, blackBrush
+    INVOKE CreatePen, PS_SOLID, 1, 0000FFFFh
+    mov testPen, eax
+    INVOKE SelectObject, paintData.hdc, testPen
+    mov oldPen, eax
+    INVOKE MoveToEx, paintData.hdc, 120, 120, 0
+    INVOKE LineTo, paintData.hdc, 680, 420
+    INVOKE SelectObject, paintData.hdc, oldPen
+    INVOKE DeleteObject, testPen
     ; EndPaint releases the temporary paint state.
     INVOKE EndPaint, hWnd, ADDR paintData
     ; Return 0 after handling the paint request.
