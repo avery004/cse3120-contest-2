@@ -392,7 +392,7 @@ UpdateGame PROC
     mov ecx, 0
 update_shots:
     cmp ecx, MAX_SHOTS
-    jae update_done
+    jae update_enemies
     cmp BYTE PTR shotActive[ecx], 0
     je next_shot
     add DWORD PTR shotDepth[ecx*4], 12
@@ -402,6 +402,20 @@ update_shots:
 next_shot:
     inc ecx
     jmp update_shots
+update_enemies:
+    mov ecx, 0
+move_enemies:
+    cmp ecx, MAX_ENEMIES
+    jae update_done
+    cmp BYTE PTR enemyActive[ecx], 0
+    je next_enemy
+    add DWORD PTR enemyDepth[ecx*4], 6
+    cmp DWORD PTR enemyDepth[ecx*4], NEAR_RADIUS
+    jbe next_enemy
+    mov BYTE PTR enemyActive[ecx], 0
+next_enemy:
+    inc ecx
+    jmp move_enemies
 update_done:
     ret
 UpdateGame ENDP
