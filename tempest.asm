@@ -14,6 +14,16 @@ FRAME_MS      EQU 16
 ; FRAME_MS targets about 60 updates per second.
 ; Keep sizes fixed while early drawing code is simple.
 ; Future code can replace these with client-area calculations.
+; First Tempest layout constants.
+CENTER_X    EQU WINDOW_WIDTH / 2
+CENTER_Y    EQU WINDOW_HEIGHT / 2
+LANE_COUNT  EQU 12
+NEAR_RADIUS EQU 220
+FAR_RADIUS  EQU 90
+; Twelve lanes gives the first tunnel a clear rhythm.
+; The near radius stays close to the player edge.
+; The far radius keeps the tunnel visually narrow.
+; Center values keep early geometry aligned in the window.
 
 INCLUDE Irvine32.inc
 ; Irvine32.inc supplies course helpers and usually includes SmallWin.inc.
