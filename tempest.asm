@@ -77,6 +77,8 @@ UpdateGame PROTO
 FireShot PROTO
 ; SpawnEnemy will activate one enemy slot in a fixed lane.
 SpawnEnemy PROTO
+; CheckShotEnemyCollision will compare active shots to active enemies.
+CheckShotEnemyCollision PROTO
 
 .data
 className   BYTE "MASMTempestWindow",0
@@ -447,6 +449,8 @@ next_enemy:
     inc ecx
     jmp move_enemies
 update_done:
+    ; Run collision checks after movement finishes for this frame.
+    call CheckShotEnemyCollision
     ret
 UpdateGame ENDP
 
@@ -485,5 +489,12 @@ activate_enemy:
 spawn_done:
     ret
 SpawnEnemy ENDP
+
+; CheckShotEnemyCollision will own shot versus enemy tests.
+CheckShotEnemyCollision PROC
+    ; The first collision step only reserves the call site and label.
+    ; Later code will compare lane and depth for active objects.
+    ret
+CheckShotEnemyCollision ENDP
 
 END main
