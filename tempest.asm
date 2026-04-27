@@ -60,6 +60,8 @@ DrawTunnel PROTO,
 ; DrawPlayer will render the player marker on the near ring.
 DrawPlayer PROTO,
     hdc:DWORD
+; UpdateGame will advance timed game state.
+UpdateGame PROTO
 
 .data
 className   BYTE "MASMTempestWindow",0
@@ -200,10 +202,18 @@ WndProc PROC,
 check_create:
     ; WM_CREATE starts the fixed update timer for later game logic.
     cmp uMsg, WM_CREATE
-    jne check_keydown
+    jne check_timer
     ; The callback stays null because WM_TIMER will handle updates.
     INVOKE SetTimer, hWnd, TIMER_ID, FRAME_MS, 0
     ; Return 0 after creating the timer.
+    xor eax, eax
+    ret
+check_timer:
+    ; WM_TIMER advances state and requests another redraw.
+    cmp uMsg, WM_TIMER
+    jne check_keydown
+    INVOKE UpdateGame
+    INVOKE InvalidateRect, hWnd, 0, 1
     xor eax, eax
     ret
 check_keydown:
@@ -315,5 +325,10 @@ DrawPlayer PROC,
     INVOKE DeleteObject, testPen
     ret
 DrawPlayer ENDP
+
+; UpdateGame is empty until moving objects are added.
+UpdateGame PROC
+    ret
+UpdateGame ENDP
 
 END main
