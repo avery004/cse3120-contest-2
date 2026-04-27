@@ -219,6 +219,7 @@ WndProc PROC,
     INVOKE SelectObject, paintData.hdc, testPen
     mov oldPen, eax
     call DrawShots
+    call DrawEnemies
     INVOKE MoveToEx, paintData.hdc, 120, 120, 0
     INVOKE LineTo, paintData.hdc, 680, 420
     INVOKE SelectObject, paintData.hdc, oldPen
@@ -381,6 +382,25 @@ next_draw_shot:
 draw_shots_done:
     ret
 DrawShots ENDP
+DrawEnemies PROC
+    mov ecx, 0
+draw_enemies:
+    cmp ecx, MAX_ENEMIES
+    jae draw_enemies_done
+    cmp BYTE PTR enemyActive[ecx], 0
+    je next_draw_enemy
+    mov eax, DWORD PTR enemyLane[ecx*4]
+    mov edx, DWORD PTR farYPoints[eax*4]
+    add edx, DWORD PTR enemyDepth[ecx*4]
+    INVOKE MoveToEx, paintData.hdc, DWORD PTR farXPoints[eax*4], edx, 0
+    sub edx, 8
+    INVOKE LineTo, paintData.hdc, DWORD PTR farXPoints[eax*4], edx
+next_draw_enemy:
+    inc ecx
+    jmp draw_enemies
+draw_enemies_done:
+    ret
+DrawEnemies ENDP
 ; UpdateGame advances active shots with a simple fixed step.
 UpdateGame PROC
     ; Count update ticks before spawning another enemy.
