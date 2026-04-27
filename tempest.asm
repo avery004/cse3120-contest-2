@@ -173,7 +173,7 @@ WndProc PROC,
     lParam:DWORD
     ; WM_PAINT clears the invalid area before custom drawing is added.
     cmp uMsg, WM_PAINT
-    jne check_keydown
+    jne check_create
     ; BeginPaint returns the device context for the invalid rectangle.
     INVOKE BeginPaint, hWnd, ADDR paintData
     INVOKE GetStockObject, BLACK_BRUSH
@@ -195,6 +195,15 @@ WndProc PROC,
     ; EndPaint releases the temporary paint state.
     INVOKE EndPaint, hWnd, ADDR paintData
     ; Return 0 after handling the paint request.
+    xor eax, eax
+    ret
+check_create:
+    ; WM_CREATE starts the fixed update timer for later game logic.
+    cmp uMsg, WM_CREATE
+    jne check_keydown
+    ; The callback stays null because WM_TIMER will handle updates.
+    INVOKE SetTimer, hWnd, TIMER_ID, FRAME_MS, 0
+    ; Return 0 after creating the timer.
     xor eax, eax
     ret
 check_keydown:
