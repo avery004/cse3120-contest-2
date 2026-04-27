@@ -60,7 +60,7 @@ main PROC
     INVOKE ExitProcess, eax
 main ENDP
 
-; Placeholder WinMain keeps the future window path linkable.
+; WinMain prepares the window class and registration call.
 ; Program startup enters main first.
 ; main initializes hInstance before calling WinMain.
 ; The fourth WinMain argument is the initial show command.
@@ -76,8 +76,25 @@ WinMain PROC,
     mov eax, hInst
     mov wndClass.hInstance, eax
     mov wndClass.lpszClassName, OFFSET className
+    INVOKE LoadCursor, 0, IDC_ARROW
+    mov wndClass.hCursor, eax
+    INVOKE RegisterClass, ADDR wndClass
+    test eax, eax
+    jnz class_ready
+    mov eax, 1
+    ret
+class_ready:
     xor eax, eax
     ret
 WinMain ENDP
+
+WndProc PROC,
+    hWnd:DWORD,
+    uMsg:DWORD,
+    wParam:DWORD,
+    lParam:DWORD
+    xor eax, eax
+    ret
+WndProc ENDP
 
 END main
