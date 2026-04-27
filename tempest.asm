@@ -118,6 +118,16 @@ WndProc PROC,
     uMsg:DWORD,
     wParam:DWORD,
     lParam:DWORD
+    ; Escape closes the main window through WM_DESTROY.
+    cmp uMsg, WM_KEYDOWN
+    jne check_destroy
+    cmp wParam, VK_ESCAPE
+    jne check_destroy
+    INVOKE DestroyWindow, hWnd
+    ; Return 0 after handling the key press.
+    xor eax, eax
+    ret
+check_destroy:
     ; WM_DESTROY is handled locally.
     ; Other messages should use the default window procedure.
     ; This keeps standard window behavior intact.
