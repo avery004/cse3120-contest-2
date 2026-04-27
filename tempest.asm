@@ -211,7 +211,7 @@ not_destroy:
     ret
 WndProc ENDP
 
-; DrawTunnel traces the outer and inner rings of the tunnel.
+; DrawTunnel traces both rings and the lane connectors.
 DrawTunnel PROC,
     hdc:DWORD
     ; Start at the top of the near ring.
@@ -233,6 +233,14 @@ draw_far_ring:
     cmp ecx, LANE_COUNT
     jb draw_far_ring
     INVOKE LineTo, hdc, DWORD PTR farXPoints[0], DWORD PTR farYPoints[0]
+    ; Draw lane connectors from the outer ring inward.
+    mov ecx, 0
+draw_lane_lines:
+    INVOKE MoveToEx, hdc, DWORD PTR nearXPoints[ecx*4], DWORD PTR nearYPoints[ecx*4], 0
+    INVOKE LineTo, hdc, DWORD PTR farXPoints[ecx*4], DWORD PTR farYPoints[ecx*4]
+    inc ecx
+    cmp ecx, LANE_COUNT
+    jb draw_lane_lines
     ret
 DrawTunnel ENDP
 
