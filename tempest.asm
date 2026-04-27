@@ -197,13 +197,25 @@ check_keydown:
     cmp uMsg, WM_KEYDOWN
     jne check_destroy
     cmp wParam, VK_LEFT
-    jne check_escape
+    jne check_right
     cmp playerLane, 0
     jne move_left
     mov playerLane, LANE_COUNT
 move_left:
     dec playerLane
     ; Request a repaint after the lane changes.
+    INVOKE InvalidateRect, hWnd, 0, 1
+    xor eax, eax
+    ret
+check_right:
+    ; Right arrow wraps from the last lane back to lane 0.
+    cmp wParam, VK_RIGHT
+    jne check_escape
+    inc playerLane
+    cmp playerLane, LANE_COUNT
+    jb move_right_done
+    mov playerLane, 0
+move_right_done:
     INVOKE InvalidateRect, hWnd, 0, 1
     xor eax, eax
     ret
