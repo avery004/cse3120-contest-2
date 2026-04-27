@@ -70,6 +70,16 @@ oldPen      DWORD 0
 ; paintData stores BeginPaint and EndPaint state.
 ; blackBrush stores the stock black brush handle.
 ; testPen and oldPen store temporary GDI pen handles.
+; Precomputed near-ring coordinates for the first tunnel.
+; Points start at the top and continue clockwise.
+nearXPoints DWORD 400, 510, 590, 620, 590, 510
+           DWORD 400, 290, 210, 180, 210, 290
+nearYPoints DWORD 80, 110, 190, 300, 410, 490
+           DWORD 520, 490, 410, 300, 190, 110
+; Each index maps to the same lane in both arrays.
+; These values avoid runtime trig in the first geometry build.
+; The far ring will use the same lane order later.
+; Tunnel drawing can loop over these arrays directly.
 
 .code
 main PROC
