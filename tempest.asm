@@ -284,9 +284,22 @@ draw_lane_lines:
     ret
 DrawTunnel ENDP
 
-; DrawPlayer is empty until the marker shape is added.
+; DrawPlayer renders a small marker on the selected near lane.
 DrawPlayer PROC,
     hdc:DWORD
+    INVOKE CreatePen, PS_SOLID, PLAYER_PEN_WIDTH, PLAYER_COLOR
+    mov testPen, eax
+    INVOKE SelectObject, hdc, testPen
+    mov oldPen, eax
+    mov eax, playerLane
+    mov ecx, DWORD PTR nearXPoints[eax*4]
+    mov edx, DWORD PTR nearYPoints[eax*4]
+    sub edx, PLAYER_MARKER_SIZE
+    INVOKE MoveToEx, hdc, ecx, edx, 0
+    add edx, PLAYER_MARKER_SIZE * 2
+    INVOKE LineTo, hdc, ecx, edx
+    INVOKE SelectObject, hdc, oldPen
+    INVOKE DeleteObject, testPen
     ret
 DrawPlayer ENDP
 
