@@ -45,12 +45,14 @@ windowTitle BYTE "MASM Tempest",0
 hInstance   DWORD 0
 hWndMain    DWORD 0
 wndClass    WNDCLASS <>
+msgData     MSG <>
 ; Stores future window identifiers.
 ; className is used when registering the class.
 ; windowTitle appears in the title bar.
 ; hInstance is filled before WinMain runs.
 ; hWndMain stores the CreateWindowEx result.
 ; wndClass stores the registration data for the main window.
+; msgData stores one message-loop record.
 
 .code
 main PROC
@@ -98,6 +100,14 @@ window_ready:
     INVOKE ShowWindow, hWndMain, nCmdShow
     ; UpdateWindow forces the first paint immediately.
     INVOKE UpdateWindow, hWndMain
+    ; Control will stay in WinMain once GetMessage is connected.
+message_loop:
+    ; GetMessage will decide whether the program keeps running.
+    ; TranslateMessage will prepare keyboard messages for dispatch.
+    ; DispatchMessage will send work to the window procedure.
+    jmp message_exit
+message_exit:
+    ; WinMain still returns a fixed status until the loop is filled in.
     xor eax, eax
     ret
 WinMain ENDP
