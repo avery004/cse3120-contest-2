@@ -57,6 +57,9 @@ WndProc PROTO,
 ; DrawTunnel will own the wireframe tunnel drawing path.
 DrawTunnel PROTO,
     hdc:DWORD
+; DrawPlayer will render the player marker on the near ring.
+DrawPlayer PROTO,
+    hdc:DWORD
 
 .data
 className   BYTE "MASMTempestWindow",0
@@ -179,6 +182,8 @@ WndProc PROC,
     INVOKE FillRect, paintData.hdc, ADDR paintData.rcPaint, blackBrush
     ; DrawTunnel will replace the temporary test line over time.
     INVOKE DrawTunnel, paintData.hdc
+    ; DrawPlayer will sit on top of the tunnel geometry.
+    INVOKE DrawPlayer, paintData.hdc
     INVOKE CreatePen, PS_SOLID, 1, 0000FFFFh
     mov testPen, eax
     INVOKE SelectObject, paintData.hdc, testPen
@@ -278,5 +283,11 @@ draw_lane_lines:
     jb draw_lane_lines
     ret
 DrawTunnel ENDP
+
+; DrawPlayer is empty until the marker shape is added.
+DrawPlayer PROC,
+    hdc:DWORD
+    ret
+DrawPlayer ENDP
 
 END main
