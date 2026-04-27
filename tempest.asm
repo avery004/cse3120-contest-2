@@ -118,6 +118,9 @@ WndProc PROC,
     uMsg:DWORD,
     wParam:DWORD,
     lParam:DWORD
+    ; WM_DESTROY is handled locally.
+    ; Other messages should use the default window procedure.
+    ; This keeps standard window behavior intact.
     ; WM_DESTROY ends the message loop through WM_QUIT.
     cmp uMsg, WM_DESTROY
     jne not_destroy
@@ -126,9 +129,10 @@ WndProc PROC,
     xor eax, eax
     ret
 not_destroy:
-    ; Later work adds a DefWindowProc fallback here.
-    ; Unhandled messages still return 0 for now.
-    xor eax, eax
+    ; Forward unhandled work to DefWindowProc.
+    INVOKE DefWindowProc, hWnd, uMsg, wParam, lParam
+    ; This preserves default close, move, and sizing behavior.
+    ; DefWindowProc returns the result in eax.
     ret
 WndProc ENDP
 
