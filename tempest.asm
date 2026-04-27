@@ -27,6 +27,8 @@ PLAYER_START_LANE  EQU 0
 MAX_SHOTS          EQU 6
 MAX_ENEMIES        EQU 6
 SPAWN_TICKS        EQU 45
+START_SCORE        EQU 0
+INITIAL_LIVES      EQU 3
 ; Twelve lanes gives the first tunnel a clear rhythm.
 ; The near radius stays close to the player edge.
 ; The far radius keeps the tunnel visually narrow.
@@ -37,6 +39,8 @@ SPAWN_TICKS        EQU 45
 ; A fixed pool keeps the first firing code simple.
 ; Enemy slots start with the same fixed pool size.
 ; Spawn timing starts slow enough to keep the first wave readable.
+; The opening score and life count start from simple fixed values.
+; This keeps the first collision rules easy to test.
 
 INCLUDE Irvine32.inc
 ; Irvine32.inc supplies course helpers and usually includes SmallWin.inc.
@@ -93,6 +97,8 @@ enemyActive BYTE  MAX_ENEMIES DUP(0)
 enemyLane   DWORD MAX_ENEMIES DUP(0)
 enemyDepth  DWORD MAX_ENEMIES DUP(0)
 enemySpawnTick DWORD 0
+score       DWORD START_SCORE
+lives       DWORD INITIAL_LIVES
 ; Stores future window identifiers.
 ; className is used when registering the class.
 ; windowTitle appears in the title bar.
@@ -116,6 +122,10 @@ enemySpawnTick DWORD 0
 ; The first enemy logic will scan these arrays linearly.
 ; Enemy arrays mirror the shot layout for simple update loops.
 ; enemySpawnTick counts update ticks until the next spawn check.
+; score starts at zero for a new run.
+; lives starts at the opening reserve count.
+; Later collision code will update both values.
+; The HUD drawing step can read these values directly.
 ; Precomputed near-ring coordinates for the first tunnel.
 ; Points start at the top and continue clockwise.
 nearXPoints DWORD 400, 510, 590, 620, 590, 510
