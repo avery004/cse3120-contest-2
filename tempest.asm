@@ -46,6 +46,7 @@ hInstance   DWORD 0
 hWndMain    DWORD 0
 wndClass    WNDCLASS <>
 msgData     MSG <>
+paintData   PAINTSTRUCT <>
 ; Stores future window identifiers.
 ; className is used when registering the class.
 ; windowTitle appears in the title bar.
@@ -53,6 +54,7 @@ msgData     MSG <>
 ; hWndMain stores the CreateWindowEx result.
 ; wndClass stores the registration data for the main window.
 ; msgData stores one message-loop record.
+; paintData stores BeginPaint and EndPaint state.
 
 .code
 main PROC
@@ -118,6 +120,15 @@ WndProc PROC,
     uMsg:DWORD,
     wParam:DWORD,
     lParam:DWORD
+    ; WM_PAINT is acknowledged before any drawing is added.
+    cmp uMsg, WM_PAINT
+    jne check_keydown
+    INVOKE BeginPaint, hWnd, ADDR paintData
+    INVOKE EndPaint, hWnd, ADDR paintData
+    ; Return 0 after handling the paint request.
+    xor eax, eax
+    ret
+check_keydown:
     ; Escape closes the main window through WM_DESTROY.
     cmp uMsg, WM_KEYDOWN
     jne check_destroy
