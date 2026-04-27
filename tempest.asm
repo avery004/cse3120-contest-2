@@ -100,15 +100,16 @@ window_ready:
     INVOKE ShowWindow, hWndMain, nCmdShow
     ; UpdateWindow forces the first paint immediately.
     INVOKE UpdateWindow, hWndMain
-    ; Control will stay in WinMain once GetMessage is connected.
+    ; Control stays in WinMain until GetMessage returns 0.
 message_loop:
-    ; GetMessage will decide whether the program keeps running.
-    ; TranslateMessage will prepare keyboard messages for dispatch.
-    ; DispatchMessage will send work to the window procedure.
-    jmp message_exit
+    INVOKE GetMessage, ADDR msgData, 0, 0, 0
+    test eax, eax
+    jz message_exit
+    INVOKE TranslateMessage, ADDR msgData
+    INVOKE DispatchMessage, ADDR msgData
+    jmp message_loop
 message_exit:
-    ; WinMain still returns a fixed status until the loop is filled in.
-    xor eax, eax
+    mov eax, msgData.wParam
     ret
 WinMain ENDP
 
