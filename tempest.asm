@@ -202,6 +202,7 @@ WndProc PROC,
     mov testPen, eax
     INVOKE SelectObject, paintData.hdc, testPen
     mov oldPen, eax
+    call DrawShots
     INVOKE MoveToEx, paintData.hdc, 120, 120, 0
     INVOKE LineTo, paintData.hdc, 680, 420
     INVOKE SelectObject, paintData.hdc, oldPen
@@ -345,6 +346,25 @@ DrawPlayer PROC,
     ret
 DrawPlayer ENDP
 
+DrawShots PROC
+    mov ecx, 0
+draw_shots:
+    cmp ecx, MAX_SHOTS
+    jae draw_shots_done
+    cmp BYTE PTR shotActive[ecx], 0
+    je next_draw_shot
+    mov eax, DWORD PTR shotLane[ecx*4]
+    mov edx, DWORD PTR nearYPoints[eax*4]
+    sub edx, DWORD PTR shotDepth[ecx*4]
+    INVOKE MoveToEx, paintData.hdc, DWORD PTR nearXPoints[eax*4], edx, 0
+    add edx, 8
+    INVOKE LineTo, paintData.hdc, DWORD PTR nearXPoints[eax*4], edx
+next_draw_shot:
+    inc ecx
+    jmp draw_shots
+draw_shots_done:
+    ret
+DrawShots ENDP
 ; UpdateGame advances active shots with a simple fixed step.
 UpdateGame PROC
     mov ecx, 0
