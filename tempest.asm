@@ -118,6 +118,16 @@ WndProc PROC,
     uMsg:DWORD,
     wParam:DWORD,
     lParam:DWORD
+    ; WM_DESTROY ends the message loop through WM_QUIT.
+    cmp uMsg, WM_DESTROY
+    jne not_destroy
+    INVOKE PostQuitMessage, 0
+    ; Return 0 after handling the destroy notification.
+    xor eax, eax
+    ret
+not_destroy:
+    ; Later work adds a DefWindowProc fallback here.
+    ; Unhandled messages still return 0 for now.
     xor eax, eax
     ret
 WndProc ENDP
