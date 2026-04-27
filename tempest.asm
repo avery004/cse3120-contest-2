@@ -26,6 +26,7 @@ PLAYER_PEN_WIDTH   EQU 2
 PLAYER_START_LANE  EQU 0
 MAX_SHOTS          EQU 6
 MAX_ENEMIES        EQU 6
+SPAWN_TICKS        EQU 45
 ; Twelve lanes gives the first tunnel a clear rhythm.
 ; The near radius stays close to the player edge.
 ; The far radius keeps the tunnel visually narrow.
@@ -35,6 +36,7 @@ MAX_ENEMIES        EQU 6
 ; Shots start with a small fixed pool.
 ; A fixed pool keeps the first firing code simple.
 ; Enemy slots start with the same fixed pool size.
+; Spawn timing starts slow enough to keep the first wave readable.
 
 INCLUDE Irvine32.inc
 ; Irvine32.inc supplies course helpers and usually includes SmallWin.inc.
@@ -90,6 +92,7 @@ shotDepth   DWORD MAX_SHOTS DUP(0)
 enemyActive BYTE  MAX_ENEMIES DUP(0)
 enemyLane   DWORD MAX_ENEMIES DUP(0)
 enemyDepth  DWORD MAX_ENEMIES DUP(0)
+enemySpawnTick DWORD 0
 ; Stores future window identifiers.
 ; className is used when registering the class.
 ; windowTitle appears in the title bar.
@@ -112,6 +115,7 @@ enemyDepth  DWORD MAX_ENEMIES DUP(0)
 ; enemyDepth stores tunnel depth for each active enemy.
 ; The first enemy logic will scan these arrays linearly.
 ; Enemy arrays mirror the shot layout for simple update loops.
+; enemySpawnTick counts update ticks until the next spawn check.
 ; Precomputed near-ring coordinates for the first tunnel.
 ; Points start at the top and continue clockwise.
 nearXPoints DWORD 400, 510, 590, 620, 590, 510
@@ -379,6 +383,12 @@ draw_shots_done:
 DrawShots ENDP
 ; UpdateGame advances active shots with a simple fixed step.
 UpdateGame PROC
+    ; Count update ticks before spawning another enemy.
+    inc enemySpawnTick
+    cmp enemySpawnTick, SPAWN_TICKS
+    jb update_shots
+    mov enemySpawnTick, 0
+    call SpawnEnemy
     mov ecx, 0
 update_shots:
     cmp ecx, MAX_SHOTS
