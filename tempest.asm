@@ -44,11 +44,13 @@ className   BYTE "MASMTempestWindow",0
 windowTitle BYTE "MASM Tempest",0
 hInstance   DWORD 0
 hWndMain    DWORD 0
+wndClass    WNDCLASS <>
 ; Stores future window identifiers.
 ; className is used when registering the class.
 ; windowTitle appears in the title bar.
 ; hInstance is filled before WinMain runs.
 ; hWndMain stores the CreateWindowEx result.
+; wndClass stores the registration data for the main window.
 
 .code
 main PROC
@@ -62,12 +64,18 @@ main ENDP
 ; Program startup enters main first.
 ; main initializes hInstance before calling WinMain.
 ; The fourth WinMain argument is the initial show command.
-; The placeholder returns 0 until window setup is added.
+; WinMain now begins preparing the WNDCLASS record.
+; Registration and window creation are added later.
 WinMain PROC,
     hInst:DWORD,
     hPrevInst:DWORD,
     lpCmdLine:DWORD,
     nCmdShow:DWORD
+    mov wndClass.style, CS_HREDRAW or CS_VREDRAW
+    mov wndClass.lpfnWndProc, OFFSET WndProc
+    mov eax, hInst
+    mov wndClass.hInstance, eax
+    mov wndClass.lpszClassName, OFFSET className
     xor eax, eax
     ret
 WinMain ENDP
