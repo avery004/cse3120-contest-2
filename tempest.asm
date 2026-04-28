@@ -113,6 +113,8 @@ gameState   DWORD STATE_TITLE
 ; Title strings support the opening screen prompt.
 titleText1  BYTE "MASM TEMPEST",0
 titleText2  BYTE "PRESS SPACE TO START",0
+gameOverText1 BYTE "GAME OVER",0
+gameOverText2 BYTE "PRESS ENTER TO RESTART",0
 ; Stores future window identifiers.
 ; className is used when registering the class.
 ; windowTitle appears in the title bar.
@@ -254,10 +256,17 @@ WndProc PROC,
     INVOKE DeleteObject, testPen
     ; Draw a minimal title prompt before live play begins.
     cmp gameState, STATE_TITLE
-    jne finish_paint
+    jne check_game_over
     INVOKE SetTextColor, paintData.hdc, 0000FFFFh
     INVOKE TextOut, paintData.hdc, 320, 24, ADDR titleText1, LENGTHOF titleText1 - 1
     INVOKE TextOut, paintData.hdc, 250, 52, ADDR titleText2, LENGTHOF titleText2 - 1
+    jmp finish_paint
+check_game_over:
+    cmp gameState, STATE_GAME_OVER
+    jne finish_paint
+    INVOKE SetTextColor, paintData.hdc, 0000FFFFh
+    INVOKE TextOut, paintData.hdc, 332, 24, ADDR gameOverText1, LENGTHOF gameOverText1 - 1
+    INVOKE TextOut, paintData.hdc, 230, 52, ADDR gameOverText2, LENGTHOF gameOverText2 - 1
 finish_paint:
     ; EndPaint releases the temporary paint state.
     INVOKE EndPaint, hWnd, ADDR paintData
