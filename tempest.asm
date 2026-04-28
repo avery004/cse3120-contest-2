@@ -434,8 +434,16 @@ next_draw_enemy:
 draw_enemies_done:
     ret
 DrawEnemies ENDP
-; UpdateGame advances active shots with a simple fixed step.
+; UpdateGame advances live gameplay state only during active play.
 UpdateGame PROC
+    ; Freeze movement, spawning, and collisions outside active play.
+    ; Title, pause, and game-over all share this early return.
+    ; Reset the spawn counter so resume does not burst-spawn.
+    cmp gameState, STATE_PLAYING
+    je update_live
+    mov enemySpawnTick, 0
+    ret
+update_live:
     ; Count update ticks before spawning another enemy.
     inc enemySpawnTick
     cmp enemySpawnTick, SPAWN_TICKS
