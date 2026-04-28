@@ -298,6 +298,9 @@ check_keydown:
     jne check_destroy
     cmp wParam, VK_LEFT
     jne check_right
+    ; Movement input only applies during active play.
+    cmp gameState, STATE_PLAYING
+    jne check_right
     cmp playerLane, 0
     jne move_left
     mov playerLane, LANE_COUNT
@@ -310,6 +313,8 @@ move_left:
 check_right:
     ; Right arrow wraps from the last lane back to lane 0.
     cmp wParam, VK_RIGHT
+    jne check_fire
+    cmp gameState, STATE_PLAYING
     jne check_fire
     inc playerLane
     cmp playerLane, LANE_COUNT
@@ -325,11 +330,15 @@ check_fire:
     jne check_enter
     ; The first Space press only leaves the title state.
     cmp gameState, STATE_TITLE
-    jne fire_shot
+    jne check_play_fire
     mov gameState, STATE_PLAYING
     INVOKE InvalidateRect, hWnd, 0, 1
     xor eax, eax
     ret
+check_play_fire:
+    ; Space only fires while live gameplay is running.
+    cmp gameState, STATE_PLAYING
+    jne check_enter
 fire_shot:
     INVOKE FireShot
     xor eax, eax
