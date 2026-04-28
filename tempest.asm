@@ -301,7 +301,7 @@ move_right_done:
 check_fire:
     ; Space starts play from title, then fires during live play.
     cmp wParam, VK_SPACE
-    jne check_escape
+    jne check_enter
     ; The first Space press only leaves the title state.
     cmp gameState, STATE_TITLE
     jne fire_shot
@@ -311,6 +311,24 @@ check_fire:
     ret
 fire_shot:
     INVOKE FireShot
+    xor eax, eax
+    ret
+check_enter:
+    cmp wParam, VK_RETURN
+    jne check_escape
+    cmp gameState, STATE_GAME_OVER
+    jne check_escape
+    mov score, START_SCORE
+    mov lives, INITIAL_LIVES
+    mov playerLane, PLAYER_START_LANE
+    mov enemySpawnTick, 0
+    mov gameState, STATE_PLAYING
+    mov ecx, MAX_SHOTS
+reset_slots:
+    dec ecx
+    mov BYTE PTR shotActive[ecx], 0
+    mov BYTE PTR enemyActive[ecx], 0
+    jnz reset_slots
     xor eax, eax
     ret
 check_escape:
