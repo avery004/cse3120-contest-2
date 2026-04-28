@@ -299,9 +299,17 @@ move_right_done:
     xor eax, eax
     ret
 check_fire:
-    ; Space will fire from the current player lane.
+    ; Space starts play from title, then fires during live play.
     cmp wParam, VK_SPACE
     jne check_escape
+    ; The first Space press only leaves the title state.
+    cmp gameState, STATE_TITLE
+    jne fire_shot
+    mov gameState, STATE_PLAYING
+    INVOKE InvalidateRect, hWnd, 0, 1
+    xor eax, eax
+    ret
+fire_shot:
     INVOKE FireShot
     xor eax, eax
     ret
