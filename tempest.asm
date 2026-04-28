@@ -446,7 +446,15 @@ move_enemies:
     je next_enemy
     add DWORD PTR enemyDepth[ecx*4], 6
     cmp DWORD PTR enemyDepth[ecx*4], NEAR_RADIUS
-    jbe next_enemy
+    jb next_enemy
+    ; Remove enemies that reach the player edge.
+    mov eax, DWORD PTR enemyLane[ecx*4]
+    cmp eax, playerLane
+    jne clear_enemy
+    cmp DWORD PTR lives, 0
+    je clear_enemy
+    dec DWORD PTR lives
+clear_enemy:
     mov BYTE PTR enemyActive[ecx], 0
 next_enemy:
     inc ecx
