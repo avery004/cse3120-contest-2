@@ -240,21 +240,22 @@ WndProc PROC,
     mov blackBrush, eax
     ; FillRect uses the stock brush, so there is nothing to delete here.
     INVOKE FillRect, paintData.hdc, ADDR paintData.rcPaint, blackBrush
-    ; DrawTunnel will replace the temporary test line over time.
+    ; DrawTunnel lays down the wireframe playfield.
     INVOKE DrawTunnel, paintData.hdc
     ; DrawPlayer will sit on top of the tunnel geometry.
     INVOKE DrawPlayer, paintData.hdc
+    ; Use one bright pen for shot and enemy overlay lines.
     INVOKE CreatePen, PS_SOLID, 1, 0000FFFFh
     mov testPen, eax
     INVOKE SelectObject, paintData.hdc, testPen
     mov oldPen, eax
+    ; The moving objects now own this overlay pen work.
     call DrawShots
     call DrawEnemies
-    INVOKE MoveToEx, paintData.hdc, 120, 120, 0
-    INVOKE LineTo, paintData.hdc, 680, 420
     INVOKE SelectObject, paintData.hdc, oldPen
     INVOKE DeleteObject, testPen
-    ; Draw a minimal title prompt before live play begins.
+    ; Draw state prompts with a transparent text background.
+    INVOKE SetBkMode, paintData.hdc, TRANSPARENT
     cmp gameState, STATE_TITLE
     jne check_game_over
     INVOKE SetTextColor, paintData.hdc, 0000FFFFh
@@ -268,6 +269,7 @@ check_game_over:
     INVOKE TextOut, paintData.hdc, 332, 24, ADDR gameOverText1, LENGTHOF gameOverText1 - 1
     INVOKE TextOut, paintData.hdc, 230, 52, ADDR gameOverText2, LENGTHOF gameOverText2 - 1
 finish_paint:
+    INVOKE SetBkMode, paintData.hdc, OPAQUE
     ; EndPaint releases the temporary paint state.
     INVOKE EndPaint, hWnd, ADDR paintData
     ; Return 0 after handling the paint request.
