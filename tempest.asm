@@ -110,6 +110,9 @@ enemySpawnTick DWORD 0
 score       DWORD START_SCORE
 lives       DWORD INITIAL_LIVES
 gameState   DWORD STATE_TITLE
+; Title strings support the opening screen prompt.
+titleText1  BYTE "MASM TEMPEST",0
+titleText2  BYTE "PRESS SPACE TO START",0
 ; Stores future window identifiers.
 ; className is used when registering the class.
 ; windowTitle appears in the title bar.
@@ -249,6 +252,13 @@ WndProc PROC,
     INVOKE LineTo, paintData.hdc, 680, 420
     INVOKE SelectObject, paintData.hdc, oldPen
     INVOKE DeleteObject, testPen
+    ; Draw a minimal title prompt before live play begins.
+    cmp gameState, STATE_TITLE
+    jne finish_paint
+    INVOKE SetTextColor, paintData.hdc, 0000FFFFh
+    INVOKE TextOut, paintData.hdc, 320, 24, ADDR titleText1, LENGTHOF titleText1 - 1
+    INVOKE TextOut, paintData.hdc, 250, 52, ADDR titleText2, LENGTHOF titleText2 - 1
+finish_paint:
     ; EndPaint releases the temporary paint state.
     INVOKE EndPaint, hWnd, ADDR paintData
     ; Return 0 after handling the paint request.
