@@ -477,8 +477,14 @@ move_enemies:
     mov eax, DWORD PTR enemyLane[ecx*4]
     cmp eax, playerLane
     jne clear_enemy
-    cmp DWORD PTR lives, 0
-    je clear_enemy
+    ; The final life flips the game into the game-over state.
+    cmp DWORD PTR lives, 1
+    ja lose_life
+    mov DWORD PTR lives, 0
+    mov gameState, STATE_GAME_OVER
+    jmp clear_enemy
+lose_life:
+    ; Earlier hits only reduce the remaining life count.
     dec DWORD PTR lives
 clear_enemy:
     mov BYTE PTR enemyActive[ecx], 0
