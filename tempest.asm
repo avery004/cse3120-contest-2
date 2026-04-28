@@ -30,6 +30,10 @@ SPAWN_TICKS        EQU 45
 START_SCORE        EQU 0
 INITIAL_LIVES      EQU 3
 ENEMY_SCORE        EQU 100
+STATE_TITLE        EQU 0
+STATE_PLAYING      EQU 1
+STATE_PAUSED       EQU 2
+STATE_GAME_OVER    EQU 3
 ; Twelve lanes gives the first tunnel a clear rhythm.
 ; The near radius stays close to the player edge.
 ; The far radius keeps the tunnel visually narrow.
@@ -43,6 +47,8 @@ ENEMY_SCORE        EQU 100
 ; The opening score and life count start from simple fixed values.
 ; This keeps the first collision rules easy to test.
 ; Score stays integer-only for simple HUD output later.
+; Game state values keep later input and timer checks simple.
+; Title remains the default until an explicit start action.
 
 INCLUDE Irvine32.inc
 ; Irvine32.inc supplies course helpers and usually includes SmallWin.inc.
@@ -103,6 +109,7 @@ enemyDepth  DWORD MAX_ENEMIES DUP(0)
 enemySpawnTick DWORD 0
 score       DWORD START_SCORE
 lives       DWORD INITIAL_LIVES
+gameState   DWORD STATE_TITLE
 ; Stores future window identifiers.
 ; className is used when registering the class.
 ; windowTitle appears in the title bar.
@@ -131,6 +138,9 @@ lives       DWORD INITIAL_LIVES
 ; Later collision code will update both values.
 ; The HUD drawing step can read these values directly.
 ; Enemy hits add a fixed score bonus.
+; gameState starts on the title screen before live play begins.
+; Pause and game-over states will share the same storage slot.
+; Restart logic can reset this value without new variables.
 ; Precomputed near-ring coordinates for the first tunnel.
 ; Points start at the top and continue clockwise.
 nearXPoints DWORD 400, 510, 590, 620, 590, 510
